@@ -1,0 +1,506 @@
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { ChevronLeft, ChevronRight, MapPin, Users, Wifi, Wind, Star, Calendar, ArrowLeft, Heart, Share2 } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { provincesData } from "../data/provincesData";
+import ReviewModal from "../components/ReviewModal";
+
+export default function HotelDetails() {
+  const navigate = useNavigate();
+  const { hotelId } = useParams();
+  const { user, addBooking } = useAuth();
+  const [searchParams] = useSearchParams();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [bookingData, setBookingData] = useState({
+    checkIn: "",
+    checkOut: "",
+    guests: "1",
+    roomType: "Standard Room", // Add room type selection
+  });
+
+  const roomTypes = [
+    { type: "Standard Room", size: "250 sq ft", price: 2500, capacity: "2 guests" },
+    { type: "Deluxe Room", size: "350 sq ft", price: 3500, capacity: "3 guests" },
+    { type: "Suite", size: "500 sq ft", price: 5000, capacity: "4 guests" },
+  ];
+
+  // Find hotel from data
+  let hotelData = null;
+  let hotelName = "";
+  let districtName = "";
+  let provinceName = "";
+
+  provincesData.forEach(province => {
+    province.districts.forEach(district => {
+      const hotel = district.hotels.find(h => h.name.replace(/\s+/g, "-").toLowerCase() === hotelId);
+      if (hotel) {
+        hotelData = hotel;
+        hotelName = hotel.name;
+        districtName = district.title;
+        provinceName = province.key;
+      }
+    });
+  });
+
+  if (!hotelData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-gray-900">Hotel not found</h1>
+          <button
+            onClick={() => navigate(-1)}
+            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const allImages = [
+    "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg",
+    ...(hotelData.roomImages || []),
+    "https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg",
+    "https://images.pexels.com/photos/1456265/pexels-photo-1456265.jpeg",
+  ];
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
+  const handleBookingChange = (e) => {
+    const { name, value } = e.target;
+    setBookingData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const calculatePrice = () => {
+    const selectedRoom = roomTypes.find(r => r.type === bookingData.roomType);
+    const pricePerNight = selectedRoom?.price || parseInt(hotelData.price);
+    if (!bookingData.checkIn || !bookingData.checkOut) return pricePerNight;
+    
+    const checkIn = new Date(bookingData.checkIn);
+    const checkOut = new Date(bookingData.checkOut);
+    const nights = Math.max(1, (checkOut - checkIn) / (1000 * 60 * 60 * 24));
+    
+    return pricePerNight * nights;
+  };
+
+  const handleConfirmBooking = () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    if (!bookingData.checkIn || !bookingData.checkOut) {
+      alert("Please select check-in and check-out dates");
+      return;
+    }
+
+    const booking = {
+      hotelName: hotelName,
+      district: districtName,
+      province: provinceName,
+      checkIn: bookingData.checkIn,
+      checkOut: bookingData.checkOut,
+      guests: bookingData.guests,
+      roomType: bookingData.roomType,
+      price: hotelData.price,
+      totalPrice: calculatePrice(),
+      rating: hotelData.rating,
+      image: allImages[0],
+    };
+
+    addBooking(booking);
+    setShowBookingModal(false);
+    alert(`Booking confirmed! Check "My Bookings" to view your reservation.`);
+    navigate("/bookings");
+  };
+
+  const availableRooms = parseInt(hotelData.availableRooms || "8");
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header with Back Button */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-gray-600 hover:text-red-700 transition-colors font-semibold"
+          >
+            <ArrowLeft size={20} />
+            Back
+          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsFavorite(!isFavorite)}
+              className="p-2 hover:bg-red-50 rounded-full transition-colors"
+            >
+              <Heart
+                size={22}
+                className={isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}
+              />
+            </button>
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <Share2 size={22} className="text-gray-600" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Image Gallery */}
+            <div className="space-y-4">
+              <div className="relative h-96 bg-gray-200 rounded-2xl overflow-hidden group">
+                <img
+                  src={allImages[currentImageIndex]}
+                  alt={`${hotelName} - Image ${currentImageIndex + 1}`}
+                  className="w-full h-full object-cover"
+                />
+
+                {/* Navigation Buttons */}
+                {allImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 transition-all shadow-lg opacity-0 group-hover:opacity-100"
+                    >
+                      <ChevronLeft size={24} className="text-gray-900" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 transition-all shadow-lg opacity-0 group-hover:opacity-100"
+                    >
+                      <ChevronRight size={24} className="text-gray-900" />
+                    </button>
+                    <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      {currentImageIndex + 1}/{allImages.length}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Thumbnail Gallery */}
+              {allImages.length > 1 && (
+                <div className="flex gap-3 overflow-x-auto pb-2">
+                  {allImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                        currentImageIndex === idx ? "border-red-600" : "border-gray-200 hover:border-red-400"
+                      }`}
+                    >
+                      <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Hotel Info */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{hotelName}</h1>
+              
+              <div className="flex items-center gap-4 mb-4 flex-wrap">
+                <div className="flex items-center gap-1">
+                  <Star className="fill-yellow-400 text-yellow-400" size={20} />
+                  <span className="font-bold text-lg">{hotelData.rating}</span>
+                  <span className="text-gray-600 text-sm">(324 reviews)</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <MapPin size={18} />
+                  <span>{districtName}, {provinceName}</span>
+                </div>
+              </div>
+
+              {/* Key Stats */}
+              <div className="grid grid-cols-3 gap-4 py-4 border-y border-gray-200 mb-6">
+                <div>
+                  <p className="text-gray-600 text-sm font-semibold">Available Rooms</p>
+                  <p className="text-2xl font-bold text-red-600">{availableRooms}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm font-semibold">Room Type</p>
+                  <p className="text-2xl font-bold text-gray-900">Suite</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm font-semibold">Quality Grade</p>
+                  <p className="text-2xl font-bold text-blue-600">★★★★★</p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-gray-900">About this hotel</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  Experience luxury and comfort at {hotelName}. Our premium accommodation offers world-class amenities and personalized service to ensure your stay is unforgettable. Located in the heart of {districtName}, we provide easy access to major attractions while maintaining a peaceful retreat atmosphere.
+                </p>
+
+                <h3 className="text-xl font-bold text-gray-900 pt-4">Room Quality & Features</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex gap-3 p-3 bg-blue-50 rounded-lg">
+                    <Wifi className="text-blue-600 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-semibold text-gray-900">High-Speed WiFi</p>
+                      <p className="text-sm text-gray-600">Complimentary ultra-fast internet</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 p-3 bg-green-50 rounded-lg">
+                    <Wind className="text-green-600 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-semibold text-gray-900">Central A/C</p>
+                      <p className="text-sm text-gray-600">Climate-controlled rooms</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 p-3 bg-purple-50 rounded-lg">
+                    <Users className="text-purple-600 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-semibold text-gray-900">Spacious Rooms</p>
+                      <p className="text-sm text-gray-600">300+ sq ft per room</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 p-3 bg-orange-50 rounded-lg">
+                    <Star className="text-orange-600 flex-shrink-0" size={20} />
+                    <div>
+                      <p className="font-semibold text-gray-900">5-Star Service</p>
+                      <p className="text-sm text-gray-600">24/7 concierge support</p>
+                    </div>
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-bold text-gray-900 pt-4">Amenities & Services</h3>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {[
+                    "Free breakfast",
+                    "Swimming pool",
+                    "Fitness center",
+                    "Spa & wellness",
+                    "Restaurant & bar",
+                    "Room service",
+                    "Laundry service",
+                    "Parking available",
+                    "Business center",
+                    "Conference rooms",
+                    "Airport transfer",
+                    "Travel assistance",
+                  ].map((amenity, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-gray-700">
+                      <span className="text-green-600 font-bold">✓</span>
+                      {amenity}
+                    </li>
+                  ))}
+                </ul>
+
+                <h3 className="text-xl font-bold text-gray-900 pt-4">Room Types Available</h3>
+                <div className="space-y-3">
+                  {roomTypes.map((room, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setBookingData({ ...bookingData, roomType: room.type })}
+                      className={`w-full p-4 border-2 rounded-lg transition-all text-left ${
+                        bookingData.roomType === room.type
+                          ? "border-red-600 bg-red-50"
+                          : "border-gray-200 hover:border-red-400 bg-white"
+                      }`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-bold text-gray-900">{room.type}</h4>
+                        <span className="text-red-600 font-bold">NPR {room.price}/night</span>
+                      </div>
+                      <div className="flex gap-4 text-sm text-gray-600">
+                        <span>📏 {room.size}</span>
+                        <span>👥 {room.capacity}</span>
+                      </div>
+                      {bookingData.roomType === room.type && (
+                        <div className="mt-2 text-xs font-semibold text-red-600">✓ Selected</div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Booking Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-20 space-y-6">
+              {/* Price Card */}
+              <div className="bg-white rounded-2xl p-6 shadow-lg">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-gray-600 text-sm mb-1">Selected Room Type</p>
+                    <p className="text-lg font-bold text-gray-900">{bookingData.roomType}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-gray-600 text-sm mb-1">Price per night</p>
+                    <p className="text-3xl font-bold text-red-600">NPR {roomTypes.find(r => r.type === bookingData.roomType)?.price || hotelData.price}</p>
+                  </div>
+
+                  <div className="space-y-3 py-4 border-y border-gray-200">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Check-In
+                      </label>
+                      <input
+                        type="date"
+                        name="checkIn"
+                        value={bookingData.checkIn}
+                        onChange={handleBookingChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Check-Out
+                      </label>
+                      <input
+                        type="date"
+                        name="checkOut"
+                        value={bookingData.checkOut}
+                        onChange={handleBookingChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Guests
+                      </label>
+                      <select
+                        name="guests"
+                        value={bookingData.guests}
+                        onChange={handleBookingChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                      >
+                        {[1, 2, 3, 4, 5, 6].map(n => (
+                          <option key={n} value={n}>{n} {n === 1 ? 'Guest' : 'Guests'}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {bookingData.checkIn && bookingData.checkOut && (
+                    <div className="space-y-2 py-3 border-b border-gray-200">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Nights</span>
+                        <span className="font-semibold">
+                          {Math.max(1, (new Date(bookingData.checkOut) - new Date(bookingData.checkIn)) / (1000 * 60 * 60 * 24))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-lg font-bold">
+                        <span>Total</span>
+                        <span className="text-red-600">NPR {calculatePrice().toLocaleString()}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      if (!user) {
+                        navigate("/login");
+                      } else {
+                        setShowBookingModal(true);
+                      }
+                    }}
+                    className="w-full bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Reserve Now
+                  </button>
+
+                  <button
+                    onClick={() => setShowReviewModal(true)}
+                    className="w-full border-2 border-red-600 text-red-600 font-bold py-3 rounded-lg hover:bg-red-50 transition-colors"
+                  >
+                    Write a Review
+                  </button>
+                </div>
+              </div>
+
+              {/* Availability Badge */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm font-semibold text-green-900 mb-2">✓ Great Availability</p>
+                <p className="text-xs text-green-800">
+                  {availableRooms} rooms available for your dates
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Booking Confirmation Modal */}
+      {showBookingModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900">Confirm Your Booking</h2>
+
+            <div className="space-y-3 py-4 border-y border-gray-200">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Hotel</span>
+                <span className="font-semibold text-gray-900">{hotelName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Room Type</span>
+                <span className="font-semibold text-gray-900">{bookingData.roomType}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Check-In</span>
+                <span className="font-semibold text-gray-900">{bookingData.checkIn}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Check-Out</span>
+                <span className="font-semibold text-gray-900">{bookingData.checkOut}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Guests</span>
+                <span className="font-semibold text-gray-900">{bookingData.guests}</span>
+              </div>
+              <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
+                <span>Total Price</span>
+                <span className="text-red-600 text-xl">NPR {calculatePrice().toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowBookingModal(false)}
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmBooking}
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        hotelName={hotelName}
+      />
+    </div>
+  );
+}

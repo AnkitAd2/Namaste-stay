@@ -31,6 +31,7 @@ const generateStaysFromProvinces = () => {
           tag: district.title,
           amenities: "WiFi,Breakfast,Parking",
           district: district.title,
+          roomImages: hotel.roomImages || [],
         };
         staysMap.set(stay.id, stay);
         stayIndex++;

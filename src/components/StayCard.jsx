@@ -1,27 +1,56 @@
-import { Heart, MapPin, Users, Wifi, Wind, Calendar, X } from "lucide-react";
+import { Heart, MapPin, Users, Wifi, Wind, Calendar, X, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import ReviewModal from "./ReviewModal";
 
-export default function StayCard({ title, subtitle, price, img, rating, tag, district }) {
+export default function StayCard({ title, subtitle, price, img, rating, tag, district, roomImages = [] }) {
   const navigate = useNavigate();
   const { user, addBooking } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [bookingData, setBookingData] = useState({
     checkIn: "",
     checkOut: "",
     guests: "1",
   });
 
-  const handleBookClick = () => {
+  // Create hotel ID from title (for URL)
+  const hotelId = title.replace(/\s+/g, "-").toLowerCase();
+
+  // Combine property image with room images
+  const allImages = [img, ...roomImages].filter(Boolean);
+  const currentImage = allImages[currentImageIndex] || img;
+
+  const nextImage = (e) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = (e) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
+  const handleCardClick = () => {
+    navigate(`/hotel/${hotelId}`);
+  };
+
+  const handleBookClick = (e) => {
+    e.stopPropagation();
     if (!user) {
-      // Redirect to login if not authenticated
       navigate("/login");
       return;
     }
     setShowBookingModal(true);
+  };
+
+  const handleReviewClick = (e) => {
+    e.stopPropagation();
+    setShowReviewModal(true);
   };
 
   const handleBookingChange = (e) => {
@@ -74,24 +103,47 @@ export default function StayCard({ title, subtitle, price, img, rating, tag, dis
   return (
     <>
       <div
+        onClick={handleCardClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all h-full flex flex-col"
+        className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all h-full flex flex-col cursor-pointer"
       >
         <div className="relative overflow-hidden h-56 bg-gray-200">
           <img
-            src={img}
-            alt={title}
-            className={`h-full w-full object-cover transition-transform duration-400 ${isHovered ? 'scale-110' : ''}`}
-          />
-          
-          <div className={`absolute inset-0 transition-colors duration-300 ${isHovered ? 'bg-black/20' : 'bg-black/0'}`} />
+          src={currentImage}
+          alt={title}
+          className={`h-full w-full object-cover transition-transform duration-400 ${isHovered ? 'scale-110' : ''}`}
+        />
+        
+        <div className={`absolute inset-0 transition-colors duration-300 ${isHovered ? 'bg-black/20' : 'bg-black/0'}`} />
 
-          {tag && (
-            <span className="absolute top-3 left-3 bg-red-700 text-white text-xs font-semibold px-3 py-1 rounded-full">
-              {tag}
-            </span>
-          )}
+        {/* Image Navigation */}
+        {allImages.length > 1 && (
+          <>
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 transition-all opacity-0 hover:opacity-100 group-hover:opacity-100"
+            >
+              <ChevronLeft size={18} className="text-gray-900" />
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 transition-all opacity-0 hover:opacity-100 group-hover:opacity-100"
+            >
+              <ChevronRight size={18} className="text-gray-900" />
+            </button>
+            {/* Image Counter */}
+            <div className="absolute bottom-3 right-3 bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full font-semibold">
+              {currentImageIndex + 1}/{allImages.length}
+            </div>
+          </>
+        )}
+
+        {tag && (
+          <span className="absolute top-3 left-3 bg-red-700 text-white text-xs font-semibold px-3 py-1 rounded-full">
+            {tag}
+          </span>
+        )}
 
           <div className="absolute top-3 right-3 flex gap-2">
             {rating && (
@@ -134,13 +186,21 @@ export default function StayCard({ title, subtitle, price, img, rating, tag, dis
               <p className="text-gray-500 text-xs">/ night</p>
             </div>
 
-            <button
-              onClick={handleBookClick}
-              className="w-full bg-red-700 text-white font-semibold py-3 rounded-xl hover:bg-red-800 hover:scale-105 transition-all flex items-center justify-center gap-2"
-            >
-              <span>Book Now</span>
-              <span className="text-lg">→</span>
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleBookClick}
+                className="flex-1 bg-red-700 text-white font-semibold py-3 rounded-xl hover:bg-red-800 hover:scale-105 transition-all flex items-center justify-center gap-2"
+              >
+                <span>Book Now</span>
+              </button>
+              <button
+                onClick={handleReviewClick}
+                className="flex-1 border-2 border-red-700 text-red-700 font-semibold py-3 rounded-xl hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+              >
+                <MessageCircle size={18} />
+                <span>Review</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -248,6 +308,13 @@ export default function StayCard({ title, subtitle, price, img, rating, tag, dis
           </div>
         </div>
       )}
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        hotelName={title}
+      />
     </>
   );
 }

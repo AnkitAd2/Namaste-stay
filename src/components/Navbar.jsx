@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, UserCircle, Menu, X, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import SearchModal from "./SearchModal";
 
 const navItems = [
   { path: "/", label: "Home" },
@@ -15,6 +16,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -23,7 +25,8 @@ export default function Navbar() {
   };
 
   return (
-    <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <>
+      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition">
           <h1 className="text-2xl font-black text-red-700">Namaste Stay</h1>
@@ -47,7 +50,11 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <button className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors">
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
+            title="Search hotels and districts"
+          >
             <Search size={18} />
           </button>
 
@@ -144,5 +151,9 @@ export default function Navbar() {
         </div>
       )}
     </header>
+
+      {/* Search Modal */}
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   );
 }

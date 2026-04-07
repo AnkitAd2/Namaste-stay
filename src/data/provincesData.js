@@ -12,48 +12,48 @@ export const provincesData = [
         title: "Taplejung",
         stays: "12 Heritage Stays",
         hotels: [
-          { name: "Taplejung Heritage Lodge", rating: "4.5", price: "2,500" },
-          { name: "Mountain View Resort", rating: "4.2", price: "2,200" }
+          { name: "Taplejung Heritage Lodge", rating: "4.5", price: "2,500", availableRooms: "12", roomImages: ["https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg", "https://images.pexels.com/photos/2467285/pexels-photo-2467285.jpeg"] },
+          { name: "Mountain View Resort", rating: "4.2", price: "2,200", availableRooms: "8", roomImages: ["https://images.pexels.com/photos/1579253/pexels-photo-1579253.jpeg"] }
         ]
       },
       {
         title: "Panchthar",
         stays: "8 Heritage Stays",
         hotels: [
-          { name: "Panchthar Retreat", rating: "4.3", price: "2,000" },
-          { name: "Tea Estate Homestay", rating: "4.4", price: "1,800" }
+          { name: "Panchthar Retreat", rating: "4.3", price: "2,000", availableRooms: "6", roomImages: ["https://images.pexels.com/photos/934044/pexels-photo-934044.jpeg"] },
+          { name: "Tea Estate Homestay", rating: "4.4", price: "1,800", availableRooms: "5", roomImages: ["https://images.pexels.com/photos/2507060/pexels-photo-2507060.jpeg"] }
         ]
       },
       {
         title: "Ilam",
         stays: "45 Homestays & Lodges",
         hotels: [
-          { name: "Ilam Tea Garden Resort", rating: "4.6", price: "3,000" },
-          { name: "Nepal Tea House", rating: "4.5", price: "2,800" },
-          { name: "Sunrise Valley Lodge", rating: "4.4", price: "2,600" }
+          { name: "Ilam Tea Garden Resort", rating: "4.6", price: "3,000", availableRooms: "15", roomImages: ["https://images.pexels.com/photos/3622622/pexels-photo-3622622.jpeg", "https://images.pexels.com/photos/3622623/pexels-photo-3622623.jpeg"] },
+          { name: "Nepal Tea House", rating: "4.5", price: "2,800", availableRooms: "10", roomImages: ["https://images.pexels.com/photos/2635038/pexels-photo-2635038.jpeg"] },
+          { name: "Sunrise Valley Lodge", rating: "4.4", price: "2,600", availableRooms: "8", roomImages: ["https://images.pexels.com/photos/1579253/pexels-photo-1579253.jpeg"] }
         ]
       },
       {
         title: "Jhapa",
         stays: "28 Hotels & Resorts",
         hotels: [
-          { name: "Jhapa Grand Hotel", rating: "4.7", price: "3,500" },
-          { name: "Janakpur Express Inn", rating: "4.3", price: "2,400" }
+          { name: "Jhapa Grand Hotel", rating: "4.7", price: "3,500", availableRooms: "18", roomImages: ["https://images.pexels.com/photos/3629278/pexels-photo-3629278.jpeg", "https://images.pexels.com/photos/3629279/pexels-photo-3629279.jpeg"] },
+          { name: "Janakpur Express Inn", rating: "4.3", price: "2,400", availableRooms: "7", roomImages: ["https://images.pexels.com/photos/2725160/pexels-photo-2725160.jpeg"] }
         ]
       },
       {
         title: "Sankhuwasabha",
         stays: "6 Boutique Inns",
         hotels: [
-          { name: "Sankhuwasabha Boutique", rating: "4.4", price: "2,700" }
+          { name: "Sankhuwasabha Boutique", rating: "4.4", price: "2,700", availableRooms: "5", roomImages: ["https://images.pexels.com/photos/4043475/pexels-photo-4043475.jpeg"] }
         ]
       },
       {
         title: "Morang",
         stays: "18 Business Hotels",
         hotels: [
-          { name: "Biratnagar Business Plaza", rating: "4.5", price: "3,200" },
-          { name: "City View Hotel", rating: "4.2", price: "2,800" }
+          { name: "Biratnagar Business Plaza", rating: "4.5", price: "3,200", availableRooms: "14", roomImages: ["https://images.pexels.com/photos/1579253/pexels-photo-1579253.jpeg", "https://images.pexels.com/photos/2507060/pexels-photo-2507060.jpeg"] },
+          { name: "City View Hotel", rating: "4.2", price: "2,800", availableRooms: "9", roomImages: ["https://images.pexels.com/photos/934044/pexels-photo-934044.jpeg"] }
         ]
       },
       {
@@ -67,50 +67,50 @@ export const provincesData = [
         title: "Dhankuta",
         stays: "8 Heritage Stays",
         hotels: [
-          { name: "Dhankuta Hill Lodge", rating: "4.3", price: "2,500" }
+          { name: "Dhankuta Hill Lodge", rating: "4.3", price: "2,500", roomImages: ["https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg"] }
         ]
       },
       {
         title: "Okhaldhunga",
         stays: "5 Mountain Lodges",
         hotels: [
-          { name: "Okhaldhunga Mountain Inn", rating: "4.2", price: "2,200" }
+          { name: "Okhaldhunga Mountain Inn", rating: "4.2", price: "2,200", roomImages: ["https://images.pexels.com/photos/2635038/pexels-photo-2635038.jpeg"] }
         ]
       },
       {
         title: "Solukhumbu",
         stays: "34 Trekking Lodges",
         hotels: [
-          { name: "Everest View Lodge", rating: "4.8", price: "4,500" },
-          { name: "Namche Bazaar Inn", rating: "4.7", price: "4,200" }
+          { name: "Everest View Lodge", rating: "4.8", price: "4,500", availableRooms: "6", roomImages: ["https://images.pexels.com/photos/3629278/pexels-photo-3629278.jpeg", "https://images.pexels.com/photos/4043475/pexels-photo-4043475.jpeg"] },
+          { name: "Namche Bazaar Inn", rating: "4.7", price: "4,200", availableRooms: "4", roomImages: ["https://images.pexels.com/photos/2725160/pexels-photo-2725160.jpeg", "https://images.pexels.com/photos/2467285/pexels-photo-2467285.jpeg"] }
         ]
       },
       {
         title: "Udayapur",
         stays: "12 Hotels",
         hotels: [
-          { name: "Udayapur Valley Resort", rating: "4.3", price: "2,600" }
+          { name: "Udayapur Valley Resort", rating: "4.3", price: "2,600", roomImages: ["https://images.pexels.com/photos/3622622/pexels-photo-3622622.jpeg"] }
         ]
       },
       {
         title: "Bhojpur",
         stays: "7 Homestays",
         hotels: [
-          { name: "Bhojpur Heritage Stay", rating: "4.2", price: "2,000" }
+          { name: "Bhojpur Heritage Stay", rating: "4.2", price: "2,000", roomImages: ["https://images.pexels.com/photos/934044/pexels-photo-934044.jpeg"] }
         ]
       },
       {
         title: "Terhathum",
         stays: "5 Lodges",
         hotels: [
-          { name: "Terhathum Rest House", rating: "4.0", price: "1,800" }
+          { name: "Terhathum Rest House", rating: "4.0", price: "1,800", roomImages: ["https://images.pexels.com/photos/1579253/pexels-photo-1579253.jpeg"] }
         ]
       },
       {
         title: "Khotang",
         stays: "9 Hotels",
         hotels: [
-          { name: "Khotang Inn", rating: "4.1", price: "2,200" }
+          { name: "Khotang Inn", rating: "4.1", price: "2,200", roomImages: ["https://images.pexels.com/photos/2507060/pexels-photo-2507060.jpeg"] }
         ]
       }
     ]

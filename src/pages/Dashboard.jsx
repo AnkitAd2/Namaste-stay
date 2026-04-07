@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, Calendar, MapPin, Users, DollarSign, X } from "lucide-react";
+import { LogOut, Calendar, MapPin, Users, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Dashboard() {
@@ -119,8 +119,12 @@ export default function Dashboard() {
                         <Users size={16} className="text-red-600" />
                         <span>{booking.guests} guests</span>
                       </div>
+                      {booking.roomType && (
+                        <div className="flex items-center gap-2 text-xs bg-blue-50 px-2 py-1 rounded">
+                          <span className="text-blue-600 font-semibold">{booking.roomType}</span>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 pt-2 border-t">
-                        <DollarSign size={16} className="text-green-600" />
                         <span className="font-bold text-gray-900">
                           NPR {booking.totalPrice || booking.price}
                         </span>
