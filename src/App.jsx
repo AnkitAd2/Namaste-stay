@@ -8,7 +8,10 @@ import HotelDetails from "./pages/HotelDetails";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import OwnerDashboard from "./pages/OwnerDashboard";
+import Favorites from "./pages/Favorites";
 import AuthProvider from "./context/AuthContext";
+import { FavoriteProvider } from "./context/FavoriteContext";
+import { ReviewProvider } from "./context/ReviewContext";
 
 function AppContent() {
   const location = useLocation();
@@ -26,6 +29,7 @@ function AppContent() {
         <Route path="/hotel/:hotelId" element={<HotelDetails />} />
         <Route path="/login" element={<Login />} />
         <Route path="/bookings" element={<Dashboard />} />
+        <Route path="/favorites" element={<Favorites />} />
         <Route path="/owner-dashboard" element={<OwnerDashboard />} />
       </Routes>
       {!hideNavFooter && <Footer />}
@@ -37,7 +41,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppContent />
+        <FavoriteProvider>
+          <ReviewProvider>
+            <AppContent />
+          </ReviewProvider>
+        </FavoriteProvider>
       </AuthProvider>
     </BrowserRouter>
   );

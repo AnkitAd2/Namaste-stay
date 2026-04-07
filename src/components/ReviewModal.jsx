@@ -1,9 +1,11 @@
 import { X, Star } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useReview } from "../context/ReviewContext";
 
-export default function ReviewModal({ isOpen, onClose, hotelName }) {
+export default function ReviewModal({ isOpen, onClose, hotelName, hotelId }) {
   const { user } = useAuth();
+  const { addReview } = useReview();
   const [rating, setRating] = useState(5);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [review, setReview] = useState("");
@@ -11,6 +13,18 @@ export default function ReviewModal({ isOpen, onClose, hotelName }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!user) {
+      alert("Please log in to submit a review");
+      return;
+    }
+
+    // Add review to context
+    addReview(hotelId, hotelName, {
+      rating,
+      text: review,
+      userName: user.name,
+    });
+
     setSubmitted(true);
     setTimeout(() => {
       setReview("");
@@ -24,7 +38,7 @@ export default function ReviewModal({ isOpen, onClose, hotelName }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-6">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-6 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
@@ -33,7 +47,7 @@ export default function ReviewModal({ isOpen, onClose, hotelName }) {
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
           >
             <X size={24} />
           </button>
@@ -53,11 +67,11 @@ export default function ReviewModal({ isOpen, onClose, hotelName }) {
                 <img
                   src={user.picture}
                   alt={user.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                  className="w-10 h-10 rounded-full object-cover shrink-0"
                 />
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-semibold text-gray-900">{user.name}</p>
-                  <p className="text-xs text-gray-600">{user.email}</p>
+                  <p className="text-xs text-gray-600 truncate">{user.email}</p>
                 </div>
               </div>
             )}
@@ -67,7 +81,7 @@ export default function ReviewModal({ isOpen, onClose, hotelName }) {
               <label className="block text-sm font-semibold text-gray-700 mb-3">
                 How would you rate your stay?
               </label>
-              <div className="flex gap-3 text-4xl">
+              <div className="flex gap-3 text-4xl flex-wrap">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -105,9 +119,9 @@ export default function ReviewModal({ isOpen, onClose, hotelName }) {
               </label>
               <textarea
                 value={review}
-                onChange={(e) => setReview(e.target.value)}
+                onChange={(e) => setReview(e.target.value.slice(0, 500))}
                 placeholder="Tell others about your stay..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none text-sm"
                 rows="4"
               />
               <p className="text-xs text-gray-500 mt-1">{review.length}/500</p>
@@ -128,13 +142,13 @@ export default function ReviewModal({ isOpen, onClose, hotelName }) {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors text-sm"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-3 bg-red-700 text-white rounded-lg font-semibold hover:bg-red-800 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 bg-red-700 text-white rounded-lg font-semibold hover:bg-red-800 transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 <Star size={18} />
                 Submit Review

@@ -1,6 +1,7 @@
 import { Search, Calendar, Users, Star, MapPin, Zap } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useReview } from "../context/ReviewContext";
 import DistrictCard from "../components/DistrictCard";
 import { provincesData } from "../data/provincesData";
 
@@ -23,12 +24,20 @@ const testimonials = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const { reviews } = useReview();
   const [searchData, setSearchData] = useState({
     district: "",
     checkIn: "",
     checkOut: "",
     guests: "1",
   });
+
+  // Calculate overall platform rating
+  const overallRating = reviews.length > 0 
+    ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
+    : 0;
+
+  const totalReviews = reviews.length;
 
   const handleSearchChange = (e) => {
     const { name, value } = e.target;
@@ -232,36 +241,97 @@ export default function Home() {
 
       {/* Testimonials Section */}
       <section className="max-w-7xl mx-auto px-6 py-12">
-        <h2 className="text-3xl font-bold text-center mb-12">
+        <h2 className="text-3xl font-bold text-center mb-4">
           What Our Guests Say
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, i) => (
-            <div
-              key={i}
-              className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <img
-                  src={testimonial.img}
-                  alt={testimonial.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <h4 className="font-semibold text-gray-800">{testimonial.name}</h4>
-                  <p className="text-xs text-gray-500">{testimonial.location}</p>
-                </div>
-              </div>
-              <div className="flex gap-1 mb-3">
-                {Array.from({ length: testimonial.rating }).map((_, i) => (
-                  <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" />
+        {/* Overall Rating Card */}
+        <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-2xl p-8 mb-12 text-center">
+          <div className="flex items-center justify-center gap-6 flex-wrap">
+            <div>
+              <div className="text-5xl font-bold text-red-700 mb-2">{overallRating}</div>
+              <div className="flex justify-center gap-1 mb-2">
+                {Array.from({ length: Math.floor(overallRating) }).map((_, i) => (
+                  <Star key={i} size={24} className="fill-yellow-400 text-yellow-400" />
                 ))}
+                {overallRating % 1 !== 0 && <Star size={24} className="fill-yellow-200 text-yellow-400" />}
               </div>
-              <p className="text-gray-600 text-sm italic">"{testimonial.text}"</p>
+              <p className="text-gray-700 font-semibold">Platform Rating</p>
             </div>
-          ))}
+            <div className="border-l-2 border-red-200 h-20"></div>
+            <div>
+              <h3 className="text-3xl font-bold text-red-700 mb-1">{totalReviews}+</h3>
+              <p className="text-gray-700 font-semibold">Guest Reviews</p>
+              <p className="text-xs text-gray-600">Verified reviews from real travelers</p>
+            </div>
+          </div>
         </div>
+
+        {/* Guest Reviews */}
+        {totalReviews > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[...reviews].reverse().slice(0, 3).map((review) => (
+              <div
+                key={review.id}
+                className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-300 to-red-600 flex items-center justify-center text-white font-bold text-lg">
+                    {review.userName.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">{review.userName}</h4>
+                    <p className="text-xs text-gray-500">{review.hotelName}</p>
+                  </div>
+                </div>
+                <div className="flex gap-1 mb-3">
+                  {Array.from({ length: review.rating }).map((_, i) => (
+                    <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-600 text-sm italic">"{review.text}"</p>
+                <p className="text-xs text-gray-400 mt-4">
+                  {new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl p-12 text-center shadow-lg">
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No Reviews Yet</h3>
+            <p className="text-gray-600">Be the first to share your Namaste Stay experience!</p>
+          </div>
+        )}
+
+        {/* Fallback Static Testimonials if No Reviews */}
+        {totalReviews === 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            {testimonials.map((testimonial, i) => (
+              <div
+                key={i}
+                className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <img
+                    src={testimonial.img}
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div>
+                    <h4 className="font-semibold text-gray-800">{testimonial.name}</h4>
+                    <p className="text-xs text-gray-500">{testimonial.location}</p>
+                  </div>
+                </div>
+                <div className="flex gap-1 mb-3">
+                  {Array.from({ length: testimonial.rating }).map((_, i) => (
+                    <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-600 text-sm italic">"{testimonial.text}"</p>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* CTA Section */}

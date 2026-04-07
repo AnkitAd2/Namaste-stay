@@ -28,20 +28,20 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 py-12">
-      <div className="max-w-6xl mx-auto px-6">
+    <div className="min-h-screen bg-linear-to-br from-red-50 via-white to-red-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
         {/* Profile Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-6">
+        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div className="flex items-start sm:items-center gap-4 sm:gap-6 w-full sm:w-auto">
               <img
                 src={user.picture}
                 alt={user.name}
-                className="w-20 h-20 rounded-full object-cover border-4 border-red-100"
+                className="w-16 sm:w-20 h-16 sm:h-20 rounded-full object-cover border-4 border-red-100 shrink-0"
               />
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
-                <p className="text-gray-600">{user.email}</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">{user.name}</h1>
+                <p className="text-gray-600 text-sm truncate">{user.email}</p>
                 <p className="text-xs text-gray-500 mt-1">
                   Member since {new Date(user.loginTime).toLocaleDateString()}
                 </p>
@@ -49,10 +49,10 @@ export default function Dashboard() {
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
+              className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold whitespace-nowrap w-full sm:w-auto justify-center"
             >
               <LogOut size={18} />
-              Logout
+              <span className="text-sm">Logout</span>
             </button>
           </div>
         </div>

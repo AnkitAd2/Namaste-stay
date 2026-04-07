@@ -1,13 +1,16 @@
-import { Heart, MapPin, Users, Wifi, Wind, Calendar, X, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, MapPin, Users, Wifi, Wind, Calendar, X, MessageCircle, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useFavorite } from "../context/FavoriteContext";
+import { useReview } from "../context/ReviewContext";
 import ReviewModal from "./ReviewModal";
 
 export default function StayCard({ title, subtitle, price, img, rating, tag, district, roomImages = [] }) {
   const navigate = useNavigate();
   const { user, addBooking } = useAuth();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { isFavorite, addFavorite, removeFavorite } = useFavorite();
+  const { getHotelRating, getHotelReviews } = useReview();
   const [isHovered, setIsHovered] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -20,6 +23,7 @@ export default function StayCard({ title, subtitle, price, img, rating, tag, dis
 
   // Create hotel ID from title (for URL)
   const hotelId = title.replace(/\s+/g, "-").toLowerCase();
+  const isLiked = isFavorite(hotelId);
 
   // Combine property image with room images
   const allImages = [img, ...roomImages].filter(Boolean);
@@ -51,6 +55,15 @@ export default function StayCard({ title, subtitle, price, img, rating, tag, dis
   const handleReviewClick = (e) => {
     e.stopPropagation();
     setShowReviewModal(true);
+  };
+
+  const handleFavoriteToggle = (e) => {
+    e.stopPropagation();
+    if (isLiked) {
+      removeFavorite(hotelId);
+    } else {
+      addFavorite(hotelId, title, img, subtitle, price);
+    }
   };
 
   const handleBookingChange = (e) => {
@@ -152,12 +165,13 @@ export default function StayCard({ title, subtitle, price, img, rating, tag, dis
               </div>
             )}
             <button
-              onClick={() => setIsFavorite(!isFavorite)}
+              onClick={handleFavoriteToggle}
               className="bg-white/90 backdrop-blur-sm rounded-full p-2 hover:bg-white hover:scale-110 transition-all"
+              title={isLiked ? "Remove from favorites" : "Add to favorites"}
             >
               <Heart
                 size={18}
-                className={isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}
+                className={isLiked ? "fill-red-500 text-red-500" : "text-gray-600"}
               />
             </button>
           </div>
@@ -178,6 +192,21 @@ export default function StayCard({ title, subtitle, price, img, rating, tag, dis
             <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full">
               <Wind size={12} /> Air-con
             </span>
+          </div>
+
+          {/* Rating and Review Section */}
+          <div className="py-3 border-t border-gray-200 mt-3">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.floor(getHotelRating(hotelId) || 4) }).map((_, i) => (
+                  <Star key={i} size={14} className="fill-yellow-400 text-yellow-400" />
+                ))}
+                <span className="text-sm font-semibold text-gray-800 ml-1">{getHotelRating(hotelId) || "4.5"}</span>
+              </div>
+              <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded-full">
+                {getHotelReviews(hotelId).length} {getHotelReviews(hotelId).length === 1 ? 'review' : 'reviews'}
+              </span>
+            </div>
           </div>
 
           <div className="mt-auto">
@@ -314,6 +343,7 @@ export default function StayCard({ title, subtitle, price, img, rating, tag, dis
         isOpen={showReviewModal}
         onClose={() => setShowReviewModal(false)}
         hotelName={title}
+        hotelId={hotelId}
       />
     </>
   );

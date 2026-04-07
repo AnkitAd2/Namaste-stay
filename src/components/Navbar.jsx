@@ -1,7 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Search, UserCircle, Menu, X, LogOut } from "lucide-react";
+import { Search, UserCircle, Menu, X, LogOut, Heart } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useFavorite } from "../context/FavoriteContext";
 import SearchModal from "./SearchModal";
 
 const navItems = [
@@ -14,6 +15,7 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { favorites } = useFavorite();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -56,6 +58,20 @@ export default function Navbar() {
             title="Search hotels and districts"
           >
             <Search size={18} />
+          </button>
+
+          {/* Favorites Button */}
+          <button
+            onClick={() => navigate("/favorites")}
+            className="relative p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-red-600 transition-colors"
+            title="My Favorites"
+          >
+            <Heart size={18} className={location.pathname === "/favorites" ? "fill-red-600 text-red-600" : ""} />
+            {favorites.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {favorites.length}
+              </span>
+            )}
           </button>
 
           {/* User Profile or Login Button */}

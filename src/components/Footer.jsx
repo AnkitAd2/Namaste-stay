@@ -1,21 +1,82 @@
 import { Share2, MessageCircle, Heart, Mail, Phone, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const footerLinks = [
   {
     title: "Company",
-    links: ["About Us", "List Your Property", "Careers", "Press"]
+    links: [
+      { label: "About Us", action: "about" },
+      { label: "List Your Property", action: "owner-dashboard" },
+      { label: "Careers", action: "careers" },
+      { label: "Press", action: "press" }
+    ]
   },
   {
     title: "Explore Nepal",
-    links: ["Destinations", "Culture Guide", "Map Search", "Blog"]
+    links: [
+      { label: "Destinations", action: "districts" },
+      { label: "Culture Guide", action: "culture" },
+      { label: "Map Search", action: "listings" },
+      { label: "Blog", action: "blog" }
+    ]
   },
   {
     title: "Support",
-    links: ["Help Center", "Contact Us", "Safety Guidelines", "Accessibility"]
+    links: [
+      { label: "Help Center", action: "help" },
+      { label: "Contact Us", action: "contact" },
+      { label: "Safety Guidelines", action: "safety" },
+      { label: "Accessibility", action: "accessibility" }
+    ]
   }
 ];
 
 export default function Footer() {
+  const navigate = useNavigate();
+
+  const handleLinkClick = (action) => {
+    // Navigate to specific pages
+    switch(action) {
+      case "owner-dashboard":
+        navigate("/owner-dashboard");
+        break;
+      case "districts":
+        navigate("/districts");
+        break;
+      case "listings":
+        navigate("/listings");
+        break;
+      case "about":
+      case "careers":
+      case "press":
+      case "culture":
+      case "blog":
+      case "help":
+      case "contact":
+      case "safety":
+      case "accessibility":
+        // Navigate to home for now, or can be expanded with more routes
+        navigate(`/?section=${action}`);
+        break;
+      default:
+        navigate("/");
+    }
+  };
+
+  const handleSocialClick = (platform) => {
+    const socialLinks = {
+      facebook: "https://facebook.com/namastestay",
+      twitter: "https://twitter.com/namastestay",
+      instagram: "https://instagram.com/namastestay",
+      email: "mailto:help@namastestay.np"
+    };
+    
+    if (platform === "email") {
+      window.location.href = socialLinks.email;
+    } else {
+      window.open(socialLinks[platform], "_blank");
+    }
+  };
   return (
     <footer className="bg-linear-to-b from-gray-900 to-black text-white mt-16">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -29,18 +90,34 @@ export default function Footer() {
               Connecting you to the heart of the Himalayas.
             </p>
             <div className="flex gap-4 mt-6">
-              <a href="#" className="text-gray-300 hover:text-red-500 hover:scale-110 transition-all">
+              <button 
+                onClick={() => handleSocialClick("facebook")}
+                className="text-gray-300 hover:text-red-500 hover:scale-110 transition-all"
+                title="Follow us on Facebook"
+              >
                 <Share2 size={20} />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-red-500 hover:scale-110 transition-all">
+              </button>
+              <button 
+                onClick={() => handleSocialClick("twitter")}
+                className="text-gray-300 hover:text-red-500 hover:scale-110 transition-all"
+                title="Follow us on Twitter"
+              >
                 <MessageCircle size={20} />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-red-500 hover:scale-110 transition-all">
+              </button>
+              <button 
+                onClick={() => handleSocialClick("instagram")}
+                className="text-gray-300 hover:text-red-500 hover:scale-110 transition-all"
+                title="Follow us on Instagram"
+              >
                 <Heart size={20} />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-red-500 hover:scale-110 transition-all">
+              </button>
+              <button 
+                onClick={() => handleSocialClick("email")}
+                className="text-gray-300 hover:text-red-500 hover:scale-110 transition-all"
+                title="Email us"
+              >
                 <Mail size={20} />
-              </a>
+              </button>
             </div>
           </div>
 
@@ -51,10 +128,13 @@ export default function Footer() {
               </h4>
               <ul className="space-y-2">
                 {section.links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-red-400 transition text-sm">
-                      {link}
-                    </a>
+                  <li key={link.label}>
+                    <button 
+                      onClick={() => handleLinkClick(link.action)}
+                      className="text-gray-400 hover:text-red-400 transition text-sm text-left hover:translate-x-1 transform"
+                    >
+                      {link.label}
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -69,17 +149,32 @@ export default function Footer() {
               <div className="flex gap-3 items-start">
                 <Phone size={16} className="text-red-500 mt-1 shrink-0" />
                 <div>
-                  <p className="text-sm text-gray-400">+977-1-4000000</p>
+                  <a 
+                    href="tel:+977-1-4000000"
+                    className="text-sm text-gray-400 hover:text-red-400 transition"
+                  >
+                    +977-1-4000000
+                  </a>
                   <p className="text-xs text-gray-500">24/7 Support</p>
                 </div>
               </div>
               <div className="flex gap-3 items-start">
                 <Mail size={16} className="text-red-500 mt-1 shrink-0" />
-                <p className="text-sm text-gray-400">help@namastestay.np</p>
+                <a 
+                  href="mailto:help@namastestay.np"
+                  className="text-sm text-gray-400 hover:text-red-400 transition"
+                >
+                  help@namastestay.np
+                </a>
               </div>
               <div className="flex gap-3 items-start">
                 <MapPin size={16} className="text-red-500 mt-1 shrink-0" />
-                <p className="text-sm text-gray-400">Kathmandu, Nepal</p>
+                <button
+                  onClick={() => window.open("https://maps.google.com/?q=Kathmandu,Nepal", "_blank")}
+                  className="text-sm text-gray-400 hover:text-red-400 transition text-left"
+                >
+                  Kathmandu, Nepal
+                </button>
               </div>
             </div>
           </div>
@@ -91,9 +186,24 @@ export default function Footer() {
               © 2024 Namaste Stay Nepal. All rights reserved.
             </p>
             <div className="flex gap-6 text-xs text-gray-400">
-              <a href="#" className="hover:text-red-400 transition">Privacy Policy</a>
-              <a href="#" className="hover:text-red-400 transition">Terms of Service</a>
-              <a href="#" className="hover:text-red-400 transition">Cookie Policy</a>
+              <button 
+                onClick={() => navigate("/?section=privacy")}
+                className="hover:text-red-400 transition"
+              >
+                Privacy Policy
+              </button>
+              <button 
+                onClick={() => navigate("/?section=terms")}
+                className="hover:text-red-400 transition"
+              >
+                Terms of Service
+              </button>
+              <button 
+                onClick={() => navigate("/?section=cookies")}
+                className="hover:text-red-400 transition"
+              >
+                Cookie Policy
+              </button>
             </div>
             <p className="text-sm font-semibold text-red-500">NPR - Nepali Rupee</p>
           </div>

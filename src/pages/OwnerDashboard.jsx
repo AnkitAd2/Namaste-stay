@@ -90,7 +90,7 @@ export default function OwnerDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-40">
+      <div className="fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-40 overflow-y-auto max-h-screen">
         {/* Logo */}
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-xl font-black text-red-700">Namaste Stay</h2>
@@ -158,16 +158,16 @@ export default function OwnerDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="ml-64 p-8">
+      <div className="ml-0 lg:ml-64 p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-4 mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900">Manager Overview</h1>
-            <p className="text-gray-600 mt-2">Welcome back. Here is what's happening with your heritage stays today.</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Manager Overview</h1>
+            <p className="text-gray-600 mt-2 text-sm sm:text-base">Welcome back. Here is what's happening with your heritage stays today.</p>
           </div>
-          <div className="text-right">
+          <div className="text-right whitespace-nowrap">
             <p className="text-sm text-gray-600">LOCAL TIME</p>
-            <p className="text-2xl font-bold text-red-600">
+            <p className="text-xl sm:text-2xl font-bold text-red-600">
               {new Date().toLocaleTimeString("en-US", {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -181,9 +181,9 @@ export default function OwnerDashboard() {
         {activeTab === "dashboard" && (
           <div className="space-y-8">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Total Properties */}
-              <div className="bg-white rounded-xl shadow-md p-6 space-y-3">
+              <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="p-3 bg-red-100 rounded-lg">
                     <Home size={24} className="text-red-600" />
@@ -195,7 +195,7 @@ export default function OwnerDashboard() {
               </div>
 
               {/* Monthly Revenue */}
-              <div className="bg-white rounded-xl shadow-md p-6 space-y-3">
+              <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="p-3 bg-yellow-100 rounded-lg">
                     <DollarSign size={24} className="text-yellow-600" />
@@ -207,7 +207,7 @@ export default function OwnerDashboard() {
               </div>
 
               {/* Active Bookings */}
-              <div className="bg-white rounded-xl shadow-md p-6 space-y-3">
+              <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="p-3 bg-green-100 rounded-lg">
                     <Calendar size={24} className="text-green-600" />
@@ -219,7 +219,7 @@ export default function OwnerDashboard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Add New Property */}
               <div className="col-span-2">
                 <div className="bg-white rounded-xl shadow-md p-8 space-y-6">
@@ -413,7 +413,7 @@ export default function OwnerDashboard() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {properties.map((property) => (
                 <div key={property.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
                   <div className="flex items-start justify-between mb-4">

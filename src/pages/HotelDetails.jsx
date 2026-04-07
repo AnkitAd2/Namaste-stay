@@ -1,7 +1,8 @@
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight, MapPin, Users, Wifi, Wind, Star, Calendar, ArrowLeft, Heart, Share2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Users, Wifi, Wind, Star, Calendar, ArrowLeft, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useReview } from "../context/ReviewContext";
 import { provincesData } from "../data/provincesData";
 import ReviewModal from "../components/ReviewModal";
 
@@ -9,11 +10,11 @@ export default function HotelDetails() {
   const navigate = useNavigate();
   const { hotelId } = useParams();
   const { user, addBooking } = useAuth();
+  const { getHotelRating, getHotelReviews } = useReview();
   const [searchParams] = useSearchParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [bookingData, setBookingData] = useState({
     checkIn: "",
     checkOut: "",
@@ -142,15 +143,6 @@ export default function HotelDetails() {
             Back
           </button>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsFavorite(!isFavorite)}
-              className="p-2 hover:bg-red-50 rounded-full transition-colors"
-            >
-              <Heart
-                size={22}
-                className={isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}
-              />
-            </button>
             <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
               <Share2 size={22} className="text-gray-600" />
             </button>
@@ -218,8 +210,8 @@ export default function HotelDetails() {
               <div className="flex items-center gap-4 mb-4 flex-wrap">
                 <div className="flex items-center gap-1">
                   <Star className="fill-yellow-400 text-yellow-400" size={20} />
-                  <span className="font-bold text-lg">{hotelData.rating}</span>
-                  <span className="text-gray-600 text-sm">(324 reviews)</span>
+                  <span className="font-bold text-lg">{getHotelRating(hotelId) || hotelData.rating}</span>
+                  <span className="text-gray-600 text-sm">({getHotelReviews(hotelId).length} {getHotelReviews(hotelId).length === 1 ? 'review' : 'reviews'})</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <MapPin size={18} />
@@ -331,6 +323,67 @@ export default function HotelDetails() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Guest Reviews Section */}
+              <h3 className="text-xl font-bold text-gray-900 pt-4">Guest Reviews</h3>
+              <div className="space-y-4">
+                {/* Overall Rating Summary */}
+                <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-4 mb-6">
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <div className="text-4xl font-bold text-red-700">{getHotelRating(hotelId) || "4.5"}</div>
+                      <div className="flex gap-1 mt-1">
+                        {Array.from({ length: Math.floor(getHotelRating(hotelId) || 4.5) }).map((_, i) => (
+                          <Star key={i} size={18} className="fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Based on {getHotelReviews(hotelId).length} reviews</p>
+                      <p className="text-sm text-gray-600">Verified guest reviews</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Individual Reviews */}
+                {getHotelReviews(hotelId).length > 0 ? (
+                  <div className="space-y-4">
+                    {getHotelReviews(hotelId).map((review) => (
+                      <div key={review.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-300 to-red-600 flex items-center justify-center text-white font-bold text-sm">
+                              {review.userName.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-semibold text-gray-900">{review.userName}</p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex gap-1">
+                            {Array.from({ length: review.rating }).map((_, i) => (
+                              <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-gray-700 text-sm leading-relaxed">{review.text}</p>
+                        {review.helpful > 0 && (
+                          <div className="mt-3 text-xs text-gray-500 flex items-center gap-1">
+                            👍 {review.helpful} people found this helpful
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 bg-gray-50 rounded-lg">
+                    <p className="text-gray-600 mb-2">No reviews yet</p>
+                    <p className="text-sm text-gray-500">Be the first to share your experience!</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -500,6 +553,7 @@ export default function HotelDetails() {
         isOpen={showReviewModal}
         onClose={() => setShowReviewModal(false)}
         hotelName={hotelName}
+        hotelId={hotelId}
       />
     </div>
   );
