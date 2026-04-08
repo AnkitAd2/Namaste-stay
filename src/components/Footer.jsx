@@ -36,6 +36,7 @@ export default function Footer() {
 
   const handleLinkClick = (action) => {
     // Navigate to specific pages
+    window.scrollTo(0, 0);
     switch(action) {
       case "owner-dashboard":
         navigate("/owner-dashboard");
@@ -187,19 +188,28 @@ export default function Footer() {
             </p>
             <div className="flex gap-6 text-xs text-gray-400">
               <button 
-                onClick={() => navigate("/?section=privacy")}
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate("/?section=privacy");
+                }}
                 className="hover:text-red-400 transition"
               >
                 Privacy Policy
               </button>
               <button 
-                onClick={() => navigate("/?section=terms")}
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate("/?section=terms");
+                }}
                 className="hover:text-red-400 transition"
               >
                 Terms of Service
               </button>
               <button 
-                onClick={() => navigate("/?section=cookies")}
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate("/?section=cookies");
+                }}
                 className="hover:text-red-400 transition"
               >
                 Cookie Policy

@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, UserCircle, Menu, X, LogOut, Heart } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useFavorite } from "../context/FavoriteContext";
 import SearchModal from "./SearchModal";
@@ -20,17 +20,31 @@ export default function Navbar() {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  // Scroll to top when location changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const handleLogout = () => {
     logout();
     navigate("/");
     setProfileMenuOpen(false);
   };
 
+  const handleNavClick = (path) => {
+    setMobileMenuOpen(false);
+    window.scrollTo(0, 0);
+  };
+
+  const handleLogoClick = () => {
+    window.scrollTo(0, 0);
+  };
+
   return (
     <>
       <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition">
+        <Link to="/" onClick={handleLogoClick} className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition">
           <h1 className="text-2xl font-black text-red-700">Namaste Stay</h1>
           <span className="text-xs text-red-600 font-semibold">Nepal</span>
         </Link>
@@ -40,6 +54,7 @@ export default function Navbar() {
             <Link
               key={item.path}
               to={item.path}
+              onClick={() => handleNavClick(item.path)}
               className={`transition-colors relative pb-1 ${
                 location.pathname === item.path
                   ? "text-red-700"
@@ -62,7 +77,10 @@ export default function Navbar() {
 
           {/* Favorites Button */}
           <button
-            onClick={() => navigate("/favorites")}
+            onClick={() => {
+              navigate("/favorites");
+              window.scrollTo(0, 0);
+            }}
             className="relative p-2 rounded-full hover:bg-gray-100 text-gray-600 hover:text-red-600 transition-colors"
             title="My Favorites"
           >
@@ -101,7 +119,10 @@ export default function Navbar() {
 
                   <Link
                     to="/bookings"
-                    onClick={() => setProfileMenuOpen(false)}
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      window.scrollTo(0, 0);
+                    }}
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   >
                     My Bookings
@@ -143,7 +164,10 @@ export default function Navbar() {
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleNavClick(item.path);
+                }}
                 className={`text-sm font-semibold py-2 px-3 rounded-lg transition-colors ${
                   location.pathname === item.path
                     ? "bg-red-100 text-red-700"
@@ -157,7 +181,10 @@ export default function Navbar() {
             {!user && (
               <Link
                 to="/login"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  window.scrollTo(0, 0);
+                }}
                 className="text-sm font-semibold py-2 px-3 rounded-lg bg-red-100 text-red-700 transition-colors"
               >
                 Login / Sign Up
